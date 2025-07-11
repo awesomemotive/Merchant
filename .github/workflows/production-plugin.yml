@@ -71,11 +71,3 @@ jobs:
           file: merchant.zip
           tag: ${{ github.ref_name }}
           overwrite: true
-
-      - name: Upload file to Slack
-        run: >
-          curl -F file=@merchant.zip
-          -F "initial_comment=*Merchant Free Production Zip*"
-          -F channels=${{ secrets.SLACK_CHANNEL_ID }}
-          -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}"
-          https://slack.com/api/files.upload

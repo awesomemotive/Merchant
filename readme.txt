@@ -219,7 +219,7 @@ Absolutely not. You can enable and customize modules without any coding knowledg
 
 == Changelog ==
 = 2.1.4 =
-* Fixed - Combatibility between woo multi currency and pre orders module
+* Fixed - Compatibility between woo multi currency and pre orders module
 
 = 2.1.3 =
 * Added - Pre-orders: Added compatibility with Kadence Email Designer
