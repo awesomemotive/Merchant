@@ -61,7 +61,7 @@ class Merchant_Pre_Orders_Main_Functionality {
 
 		add_filter( 'woocommerce_product_add_to_cart_text', array( $this, 'change_button_text' ), 10, 2 );
 		add_filter( 'woocommerce_product_single_add_to_cart_text', array( $this, 'change_button_text' ), 10, 2 );
-		add_filter( 'woocommerce_available_variation', array( $this, 'change_button_text_for_variable_products' ), 10, 3 );
+		add_filter( 'woocommerce_available_variation', array( $this, 'attach_pre_order_data_to_variations' ), 10, 3 );
 		add_action( 'woocommerce_before_add_to_cart_form', array( $this, 'additional_information_before_cart_form' ) );
 		add_action( 'woocommerce_after_add_to_cart_form', array( $this, 'additional_information_after_cart_form' ) );
 
@@ -937,15 +937,18 @@ class Merchant_Pre_Orders_Main_Functionality {
 	/**
 	 * Change pre-order button text for variable products.
 	 *
-	 * @param array  $data
-	 * @param object $product
-	 * @param object $variation
+	 * @param array                $data      variation data.
+	 * @param WC_Product           $product   The product object.
+	 * @param WC_Product_Variation $variation The variation object.
 	 *
 	 * @return array
 	 */
-	public function change_button_text_for_variable_products( $data, $product, $variation ) {
-		if ( $this->is_pre_order( $variation->get_id() ) ) {
-			$pre_order_rule = self::available_product_rule( $variation->get_id() );
+	public function attach_pre_order_data_to_variations( $data, $product, $variation ) {
+		$pre_order_rule = self::available_product_rule( $variation->get_id() );
+		if ( empty( $pre_order_rule ) ) {
+			$pre_order_rule = self::available_product_rule( $product->get_id() );
+		}
+		if ( ! empty( $pre_order_rule ) ) {
 			$data['is_pre_order'] = true;
 
 			$additional_text = $pre_order_rule['additional_text'] ? Merchant_Translator::translate( $pre_order_rule['additional_text'] )
