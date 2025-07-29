@@ -949,7 +949,8 @@ class Merchant_Pre_Orders_Main_Functionality {
 			$pre_order_rule = self::available_product_rule( $product->get_id() );
 		}
 		if ( ! empty( $pre_order_rule ) ) {
-			$data['is_pre_order'] = true;
+			$data['is_pre_order']        = true;
+			$data['pre_order_placement'] = isset( $pre_order_rule['placement'] ) ? $pre_order_rule['placement'] : 'before';
 
 			$additional_text = $pre_order_rule['additional_text'] ? Merchant_Translator::translate( $pre_order_rule['additional_text'] )
 				: esc_html__( 'Ships on {date}.', 'merchant' );
