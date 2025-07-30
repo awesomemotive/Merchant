@@ -36,11 +36,14 @@ merchant.modules = merchant.modules || {};
 				}
 				
 				$product.removeClass('merchant-pre-ordered-product');
-				
-				if( variation.is_pre_order == true ) {
+				if( variation.is_pre_order === true ) {
 					if ( variation.is_pre_order_date ) {
 						$product.addClass('merchant-pre-ordered-product');
-						$product.find('.woocommerce-variation-add-to-cart').before('<div class="merchant-pre-orders-date">'+ variation.is_pre_order_date +'</div>')
+						if(variation.pre_order_placement === 'before'){
+							$product.find('.variations_form.cart').before('<div class="merchant-pre-orders-date">'+ variation.is_pre_order_date +'</div>');
+						} else if(variation.pre_order_placement === 'after') {
+							$product.find('.variations_form.cart').after('<div class="merchant-pre-orders-date">'+ variation.is_pre_order_date +'</div>');
+						}
 					}
 					$button.html(window.merchant.setting.pre_orders_add_button_title);
 				} else {
