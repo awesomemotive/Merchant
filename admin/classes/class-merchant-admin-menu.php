@@ -300,14 +300,23 @@ if ( ! class_exists( 'Merchant_Admin_Menu' ) ) {
 
 			// Add 'Upgrade' link.
 			if ( ! defined( 'MERCHANT_PRO_VERSION' ) ) {
+				$url = merchant_admin_upgrade_link(
+					'https://athemes.com/merchant-upgrade',
+					array(
+						'utm_source'   => 'theme_submenu_page',
+						'utm_medium'   => 'button',
+						'utm_campaign' => 'Merchant',
+					),
+					'theme-submenu-page-upgrade-link'
+				);
 				add_submenu_page(
 					$this->plugin_slug,
-					esc_html__('Upgrade to Pro', 'merchant'),
-					esc_html__('Upgrade to Pro', 'merchant'),
+					esc_html__( 'Upgrade to Pro', 'merchant' ),
+					esc_html__( 'Upgrade to Pro', 'merchant' ),
 					$this->capability,
-					'https://athemes.com/merchant-upgrade?utm_source=theme_submenu_page&utm_medium=button&utm_campaign=Merchant',
+					esc_url( $url ),
 					'',
-            7
+					7
 				);
 			}
 		}
