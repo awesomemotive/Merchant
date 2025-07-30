@@ -332,7 +332,7 @@ if ( ! class_exists( 'Merchant_Metabox' ) ) {
 
 						echo '<div class="merchant-metabox-field-content">';
 
-						$meta    = get_post_meta( $post->ID, $field_id );
+						$meta    = get_post_meta( $post->ID, $field_id, false );
 						$default = ( isset( $field['default'] ) ) ? $field['default'] : null;
 						$value   = ( isset( $meta[0] ) ) ? $meta[0] : $default;
 
