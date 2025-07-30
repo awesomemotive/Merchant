@@ -289,8 +289,8 @@ if ( ! function_exists( 'merchant_admin_upgrade_link' ) ) {
 		/**
 		 * Modify upgrade link.
 		 *
-		 * @param string $upgrade Upgrade links.
-		 * @param string $type    The type of upgrade link.
+		 * @param string $url  The upgrade link URL.
+		 * @param string $type The type of upgrade link.
 		 *
 		 * @since 2.1.5
 		 *
