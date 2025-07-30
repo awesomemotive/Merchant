@@ -44,6 +44,17 @@ class Merchant_Notice_Upsell extends Merchant_Notice {
 			return;
 		}
 
+	    $url = merchant_admin_upgrade_link(
+		    'https://athemes.com/merchant-upgrade',
+		    array(
+			    'utm_source'   => 'plugin_notice',
+			    'utm_content'  => 'upgrade_notice',
+			    'utm_medium'   => 'button',
+			    'utm_campaign' => 'Merchant',
+		    ),
+            'plugin-admin-notice'
+	    );
+
 		?>
         <div class="merchant-notice merchant-notice-with-thumbnail notice" style="position:relative;">
 			<h3><?php echo esc_html__( 'Supercharge Your Store with Merchant Pro! 🚀', 'merchant' ); ?></h3>
@@ -54,7 +65,7 @@ class Merchant_Notice_Upsell extends Merchant_Notice {
 				?>
 			</p>
 
-			<a href="https://athemes.com/merchant-upgrade?utm_source=plugin_notice&utm_content=upgrade_notice&utm_medium=button&utm_campaign=Merchant" class="merchant-btn merchant-btn-secondary" target="_blank"><?php esc_html_e( 'Upgrade To Merchant Pro', 'merchant' ); ?></a>
+			<a href="<?php echo esc_url( $url ) ?>" class="merchant-btn merchant-btn-secondary" target="_blank"><?php esc_html_e( 'Upgrade To Merchant Pro', 'merchant' ); ?></a>
 			
 			<a class="notice-dismiss" href="?<?php echo esc_attr( $this->id ); ?>_dismiss=1" style="text-decoration:none;"></a>
 		</div>
