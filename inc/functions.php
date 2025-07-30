@@ -317,7 +317,7 @@ if ( ! function_exists( 'merchant_pro_license_exists' ) ) {
 	 * @return bool
 	 */
 	function merchant_pro_license_exists() {
-		return ! empty( get_option( 'merchant_license_key' ) );
+		return ! empty( get_option( 'merchant_pro_license_key' ) );
 	}
 }
 
