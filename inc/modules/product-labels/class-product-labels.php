@@ -467,7 +467,6 @@ class Merchant_Product_Labels extends Merchant_Add_Module {
 		// Kadence
 		if ( 'Kadence' === $theme_name ) {
 			$css .= '
-			    .merchant-product-labels-image-wrap img,
 				.merchant_product-labels-grid_item_html a,
 				.merchant_product-labels-grid_item_html .wc-block-grid__product-image,
 				.merchant_product-labels-grid_item_html .wc-block-grid__product-image img {
