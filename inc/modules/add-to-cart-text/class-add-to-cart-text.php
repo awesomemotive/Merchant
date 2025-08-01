@@ -83,7 +83,7 @@ class Merchant_Add_To_Cart_Text extends Merchant_Add_Module {
 		}
 
 		// Customize add to cart text on the single product page.
-		add_filter( 'woocommerce_product_single_add_to_cart_text', array( $this, 'customize_single_add_to_cart_text' ), 99 );
+		add_filter( 'woocommerce_product_single_add_to_cart_text', array( $this, 'customize_single_add_to_cart_text' ), 99, 2 );
 
 		// Customize add to cart text on shop pages.
 		add_filter( 'woocommerce_product_add_to_cart_text', array( $this, 'customize_shop_add_to_cart_text' ), 10, 2 );
@@ -201,12 +201,15 @@ class Merchant_Add_To_Cart_Text extends Merchant_Add_Module {
 	/**
 	 * Customize add to cart text the single product page.
 	 *
-	 * @param string $default_val
+	 * @param string     $default_val The "add to cart" button default label
+	 * @param WC_Product $product     The product object.
 	 *
 	 * @return string
 	 */
-	public function customize_single_add_to_cart_text( $default_val ) {
-		global $product;
+	public function customize_single_add_to_cart_text( $default_val, $product ) {
+        if( ! $product instanceof WC_Product ) {
+            return $default_val; // Return default value if product is not an instance of WC_Product. (Stay safe)
+        }
 
 		/**
 		 * Product specific
