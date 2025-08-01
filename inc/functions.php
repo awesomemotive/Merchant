@@ -273,15 +273,6 @@ if ( ! function_exists( 'merchant_admin_upgrade_link' ) ) {
 	 * @return string The upgrade link.
 	 */
 	function merchant_admin_upgrade_link( $url, $args = array(), $type = 'plugins-page-upgrade-link' ) {
-		/**
-		 * Filter the upgrade link URL args.
-		 *
-		 * @param array  $args The arguments for the upgrade link.
-		 * @param string $type The type of upgrade link.
-		 *
-		 * @since 2.1.5
-		 */
-		$args = apply_filters( 'merchant_admin_upgrade_link_args', $args, $type );
 		if ( ! empty( $args ) ) {
 			$url = add_query_arg( $args, $url );
 		}
