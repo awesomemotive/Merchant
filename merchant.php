@@ -3,7 +3,7 @@
  * Plugin Name: Merchant
  * Plugin URI:  https://athemes.com/merchant
  * Description: All-in-one WooCommerce plugin for pre-orders, product labels, buy now, quick view, discount rules and more.
- * Version:     2.1.4
+ * Version:     2.1.5
  * Author:      aThemes
  * Author URI:  https://athemes.com
  * License:     GPLv3 or later License
@@ -12,7 +12,7 @@
  * Domain Path: /languages
  *
  * WC requires at least: 6.0
- * WC tested up to: 9.6.0
+ * WC tested up to: 10.0.0
  *
  * @package Merchant
  * @since 1.0
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Merchant constants.
-define( 'MERCHANT_VERSION', '2.1.4' );
+define( 'MERCHANT_VERSION', '2.1.5' );
 define( 'MERCHANT_DB_VERSION', '1.1.0' ); // Update only when the database structure changes. In inc/classes/class-merchant-db-tables.php
 define( 'MERCHANT_FILE', __FILE__ );
 define( 'MERCHANT_BASE', trailingslashit( plugin_basename( MERCHANT_FILE ) ) );
