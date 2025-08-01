@@ -266,23 +266,27 @@ if ( ! function_exists( 'merchant_admin_upgrade_link' ) ) {
 	/**
 	 * Get the Merchant Pro upgrade link.
 	 *
-	 * @param string $medium  The medium type (link, button, etc.).
-	 * @param string $content The content to display.
+	 * @param string $url  The base URL for the upgrade link.
+	 * @param array  $args The arguments for the upgrade link. (Key-value pairs)
+	 * @param string $type The type of upgrade link.
 	 *
 	 * @return string The upgrade link.
 	 */
-	function merchant_admin_upgrade_link( $medium = 'link', $content = '' ) {
-		$url = 'https://athemes.com/merchant/#pricing';
+	function merchant_admin_upgrade_link( $url, $args = array(), $type = 'plugins-page-upgrade-link' ) {
+		if ( ! empty( $args ) ) {
+			$url = add_query_arg( $args, $url );
+		}
 
 		/**
 		 * Modify upgrade link.
 		 *
-		 * @param string $upgrade Upgrade links.
+		 * @param string $url  The upgrade link URL.
+		 * @param string $type The type of upgrade link.
 		 *
-		 * @since 2.1.2
+		 * @since 2.1.5
 		 *
 		 */
-		return apply_filters( 'merchant_upgrade_link', $url );
+		return apply_filters( 'merchant_upgrade_link', $url, $type );
 	}
 }
 
@@ -304,7 +308,7 @@ if ( ! function_exists( 'merchant_pro_license_exists' ) ) {
 	 * @return bool
 	 */
 	function merchant_pro_license_exists() {
-		return ! empty( get_option( 'merchant_license_key' ) );
+		return ! empty( get_option( 'merchant_pro_license_key' ) );
 	}
 }
 

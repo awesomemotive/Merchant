@@ -217,18 +217,18 @@ if ( ! class_exists( 'Merchant_Loader' ) ) {
 		 */
 		public function settings_link( $links ) {
 			if ( ! merchant_pro_is_active() || ! merchant_pro_license_exists() ) {
+				$url = merchant_admin_upgrade_link(
+					'https://athemes.com/merchant/#pricing',
+					array(),
+					'plugins-page-upgrade-link'
+				);
 				$links['merchant-pro'] = sprintf(
 					'<a href="%1$s" aria-label="%2$s" target="_blank" rel="noopener noreferrer"
 				style="color: #00a32a; font-weight: 700;"
 				onmouseover="this.style.color=\'#008a20\';"
 				onmouseout="this.style.color=\'#00a32a\';"
 				>%3$s</a>',
-					esc_url(
-						merchant_admin_upgrade_link(
-							'all-plugins',
-							'Get Merchant Pro'
-						)
-					),
+					esc_url( $url ),
 					esc_attr__( 'Upgrade to Merchant Pro', 'merchant' ),
 					esc_html__( 'Get Merchant Pro', 'merchant' )
 				);

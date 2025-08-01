@@ -300,14 +300,23 @@ if ( ! class_exists( 'Merchant_Admin_Menu' ) ) {
 
 			// Add 'Upgrade' link.
 			if ( ! defined( 'MERCHANT_PRO_VERSION' ) ) {
+				$url = merchant_admin_upgrade_link(
+					'https://athemes.com/merchant-upgrade',
+					array(
+						'utm_source'   => 'theme_submenu_page',
+						'utm_medium'   => 'button',
+						'utm_campaign' => 'Merchant',
+					),
+					'theme-submenu-page-upgrade-link'
+				);
 				add_submenu_page(
 					$this->plugin_slug,
-					esc_html__('Upgrade to Pro', 'merchant'),
-					esc_html__('Upgrade to Pro', 'merchant'),
+					esc_html__( 'Upgrade to Pro', 'merchant' ),
+					esc_html__( 'Upgrade to Pro', 'merchant' ),
 					$this->capability,
-					'https://athemes.com/merchant-upgrade?utm_source=theme_submenu_page&utm_medium=button&utm_campaign=Merchant',
+					esc_url( $url ),
 					'',
-            7
+					7
 				);
 			}
 		}
@@ -392,11 +401,20 @@ if ( ! class_exists( 'Merchant_Admin_Menu' ) ) {
 
 			// Upgrade to Pro (if not already defined)
 			if ( ! defined( 'MERCHANT_PRO_VERSION' ) ) {
+				$url = merchant_admin_upgrade_link(
+					'https://athemes.com/merchant-upgrade',
+					array(
+						'utm_source'   => 'theme_submenu_page',
+						'utm_medium'   => 'button',
+						'utm_campaign' => 'Merchant',
+					),
+					'adminbar-submenu-page-upgrade-link'
+				);
 				$wp_admin_bar->add_node( array(
 					'id'     => 'merchant-upgrade',
 					'parent' => 'merchant-dashboard',
 					'title'  => esc_html__( 'Upgrade to Pro', 'merchant' ),
-					'href'   => 'https://athemes.com/merchant-upgrade?utm_source=theme_submenu_page&utm_medium=button&utm_campaign=Merchant',
+					'href'   => esc_url( $url ),
 					'meta'   => array(
 						'title'  => esc_html__( 'Upgrade to Pro', 'merchant' ),
 						'target' => '_blank', // Open link in a new tab
