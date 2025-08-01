@@ -46,14 +46,14 @@ jobs:
       - name: Zip the playwright report
         run: zip -r playwright-report.zip playwright-report/
 
-      - name: Slack notification (Success)
-        run: |
-          curl -F file=@playwright-report.zip \
-               -F "initial_comment=Hey team! 
-               A new version from Merchant was released, and the frontend demo site tests have *passed successfully*! :white_check_mark:" \
-               -F channels=${{ secrets.SLACK_MERCHANT_DEMO_STATUS_CHANNEL_ID }} \
-               -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
-               https://slack.com/api/files.upload
+#      - name: Slack notification (Success)
+#        run: |
+#          curl -F file=@playwright-report.zip \
+#               -F "initial_comment=Hey team!
+#               A new version from Merchant was released, and the frontend demo site tests have *passed successfully*! :white_check_mark:" \
+#               -F channels=${{ secrets.SLACK_MERCHANT_DEMO_STATUS_CHANNEL_ID }} \
+#               -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
+#               https://slack.com/api/files.upload
 
   notify-failure:
     needs: test
@@ -69,11 +69,11 @@ jobs:
       - name: Zip the playwright report
         run: zip -r playwright-report.zip playwright-report/
 
-      - name: Slack notification (Failure)
-        run: |
-          curl -F file=@playwright-report.zip \
-               -F "initial_comment=Hey team! 
-               A new version from Merchant was released, but at least one of the frontend demo site tests *failed*! :x:" \
-               -F channels=${{ secrets.SLACK_MERCHANT_DEMO_STATUS_CHANNEL_ID }} \
-               -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
-               https://slack.com/api/files.upload
+#      - name: Slack notification (Failure)
+#        run: |
+#          curl -F file=@playwright-report.zip \
+#               -F "initial_comment=Hey team!
+#               A new version from Merchant was released, but at least one of the frontend demo site tests *failed*! :x:" \
+#               -F channels=${{ secrets.SLACK_MERCHANT_DEMO_STATUS_CHANNEL_ID }} \
+#               -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
+#               https://slack.com/api/files.upload
