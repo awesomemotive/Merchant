@@ -216,7 +216,7 @@ if ( ! class_exists( 'Merchant_Loader' ) ) {
 		 * @return array $links
 		 */
 		public function settings_link( $links ) {
-			if ( ! merchant_pro_is_active() || ! merchant_pro_license_exists() ) {
+			if ( ! merchant_pro_is_active() ) {
 				$url = merchant_admin_upgrade_link(
 					'https://athemes.com/merchant/#pricing',
 					array(),

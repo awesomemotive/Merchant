@@ -16,9 +16,19 @@ if ( ! class_exists( 'Merchant_Woo_Multi_Currency' ) ) {
 		 */
 		public function __construct() {
 			add_filter( 'merchant_discounted_price', array( $this, 'multi_currency_free_support' ) );
-			add_filter( 'merchant_pre_order_cart_sale_price', array( $this, 'multi_currency_free_support' ) );
 			add_filter( 'merchant_discounted_price', array( $this, 'multi_currency_pro_support' ) );
+
+			add_filter( 'merchant_pre_order_cart_sale_price', array( $this, 'multi_currency_free_support' ) );
 			add_filter( 'merchant_pre_order_cart_sale_price', array( $this, 'multi_currency_pro_support' ) );
+
+			// Add multi-currency support for Frequently Bought Together (FBT) cart item price
+			add_filter( 'merchant_fbt_cart_item_price', array( $this, 'multi_currency_free_support' ) );
+			add_filter( 'merchant_fbt_cart_item_price', array( $this, 'multi_currency_pro_support' ) );
+
+			// Add multi-currency support for Storewide sale cart item price
+			add_filter( 'merchant_storewide_sale_cart_item_price', array( $this, 'multi_currency_free_support' ) );
+			add_filter( 'merchant_storewide_sale_cart_item_price', array( $this, 'multi_currency_pro_support' ) );
+
 			add_filter( 'merchant_free_gifts_min_amount', array( $this, 'multi_currency_support_free_gifts' )  );
 			add_filter( 'merchant_free_gifts_min_amount', array( $this, 'multi_currency_pro_support_free_gifts' )  );
 		}
