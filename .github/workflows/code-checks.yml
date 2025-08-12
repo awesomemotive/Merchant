@@ -1,7 +1,4 @@
-# GitHub Actions Workflow for Code Tests
-# This workflow runs PHP tests on pull requests targeting the develop branch.
-
-name: Code Tests
+name: Code Tests & Build
 
 on:
   pull_request:
@@ -9,14 +6,16 @@ on:
       - develop
 
 jobs:
-  # Run php tests.
+  # Run PHP tests on multiple versions. this is an update
   php-tests:
     runs-on: ubuntu-22.04
     if: "!contains(github.event.head_commit.message, 'ci skip')"
     strategy:
+      fail-fast: false
       matrix:
         # Run on several php versions.
         php-version: [7.4, 8.0, 8.2]
+
     steps:
       - name: Setup PHP ${{ matrix.php-version }}
         uses: shivammathur/setup-php@v2
@@ -48,14 +47,120 @@ jobs:
         with:
           composer-options: -q -n -a --no-progress --prefer-dist
 
-      # Run composer script to run php syntax checks.
       - name: Run Check PHP Syntax
         run: composer phpcs:fix
 
-      # Run php coding standards checks.
       - name: Run check PHP Coding Standards
         run: ./vendor/bin/phpcs --report-full --report-checkstyle=./phpcs-report.xml
 
       - name: Annotate PHP_CodeSniffer report
         if: ${{ always() }}
         run: cs2pr --colorize --prepend-filename --notices-as-warnings --graceful-warnings --prepend-source ./phpcs-report.xml
+
+  # Build job runs only after all PHP tests pass
+  build:
+    runs-on: ubuntu-22.04
+    needs: php-tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.0
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          tools: composer
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '21'
+
+      - name: Install dependencies
+        run: composer install --no-dev --ignore-platform-reqs --prefer-dist --no-scripts --optimize-autoloader
+
+      - name: Install nodejs dependencies
+        run: npm install
+
+      - name: Generate production build
+        run: npm run production
+
+      - name: Generate translation files
+        run: npm run translate
+
+      - name: Clean unneeded files
+        run: |
+          [ -f .gitattributes ] && rm .gitattributes
+          [ -d .github ] && rm -r .github
+          [ -d .git ] && rm -r .git
+          [ -f .gitignore ] && rm .gitignore
+          [ -f phpcs.xml ] && rm phpcs.xml
+          [ -f wpgulp.config.js ] && rm wpgulp.config.js
+          [ -f playwright.config.js ] && rm playwright.config.js
+          [ -f gulpfile.babel.js ] && rm gulpfile.babel.js
+          [ -f composer.json ] && rm composer.json
+          [ -f composer.lock ] && rm composer.lock
+          [ -f package.json ] && rm package.json
+          [ -f readme.md ] && rm readme.md
+          [ -d assets/sass ] && rm -r assets/sass
+          [ -d assets/js/src ] && rm -r assets/js/src
+          [ -d node_modules ] && rm -r node_modules
+          [ -d vandor ] && rm -r vandor
+          [ -d tests ] && rm -r tests
+
+      - name: Create directory for artifacts
+        run: mkdir merchant
+
+      - name: Move files to merchant directory
+        run: rsync -av --progress --exclude=merchant . merchant/
+
+      - name: Create Artifact
+        run: zip -qq -r "merchant.zip" merchant/
+
+      - name: Upload build artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: merchant
+          path: merchant.zip
+          retention-days: 60
+
+      - name: Comment PR with build link
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const artifactUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = `
+            ✅ **Automated Build Ready for Testing**
+
+            You can download the ZIP build for this PR from the link below:
+
+            🔗 [Download Merchant Build](${artifactUrl})
+
+            _Note: The link goes to the workflow run. Scroll down to 'Artifacts' to download._
+            `;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            })
+
+      - name: Add "has-build" label to PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ["has-build-file"]
+            });
+
+      - name: Add summary with link
+        run: |
+          echo "## ✅ Automated Build Ready for Testing" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "You can download the ZIP build for this PR from the artifacts below" >> $GITHUB_STEP_SUMMARY
