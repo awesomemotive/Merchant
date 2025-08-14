@@ -3,7 +3,7 @@ Tags: pre-orders, buy now button, product labels, quick view, clear cart
 Requires at least: 5.5
 Tested up to: 6.8
 Requires PHP: 7.3
-Stable tag: 2.1.5
+Stable tag: 2.1.6
 Contributors: aThemes
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -218,6 +218,9 @@ Absolutely not. You can enable and customize modules without any coding knowledg
 15. Cookie Banner Module
 
 == Changelog ==
+= 2.1.6 =
+* Added - Compatibility with Curcy Multi-Currency Switcher
+
 = 2.1.5 =
 * Added - Wrapper function for UTM links
 * Fixed - Product Labels: Fixed distorted product image aspect ratio when used with the Kadence theme
