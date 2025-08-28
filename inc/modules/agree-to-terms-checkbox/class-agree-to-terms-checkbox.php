@@ -153,8 +153,11 @@ class Merchant_Agree_To_Terms_Checkbox extends Merchant_Add_Module {
 	 * @return void
 	 */
 	public function enqueue_css() {
-		// Specific module styles.
-		wp_enqueue_style( 'merchant-' . self::MODULE_ID, MERCHANT_URI . 'assets/css/modules/' . self::MODULE_ID . '/agree-to-terms-checkbox.min.css', array(), MERCHANT_VERSION );
+		if ( class_exists( 'WooCommerce' ) && is_checkout() ) {
+			//todo: check if we really need to enqueue this.
+			wp_enqueue_style( 'merchant-' . self::MODULE_ID, MERCHANT_URI . 'assets/css/modules/' . self::MODULE_ID . '/agree-to-terms-checkbox.min.css', array(),
+				MERCHANT_VERSION ); // Specific module styles.
+		}
 	}
 
 	/**
