@@ -93,13 +93,7 @@ class Merchant_Agree_To_Terms_Checkbox extends Merchant_Add_Module {
 		add_filter( 'woocommerce_checkout_show_terms', '__return_true' );
 
 		// Force the enable of the terms checkbox.
-		// This is needed to ensure the checkbox will be displayed.
-		// The logic here is to get the checkout page ID if the terms page ID is not set. In this condition, the ID actually doesn't matter, we just need to force the checkbox to be displayed.
-		add_filter( 'woocommerce_terms_and_conditions_page_id', function($id){
-			$terms_page_id = get_option( 'woocommerce_terms_page_id' );
-
-			return $terms_page_id ? $terms_page_id : get_option( 'woocommerce_checkout_page_id' );
-		} );
+		add_filter( 'woocommerce_terms_and_conditions_page_id', array( $this, 'force_enabling_terms_page' ) );
 
 		// Control the text from the module settings.
 		add_filter( 'woocommerce_get_terms_and_conditions_checkbox_text', array( $this, 'agree_to_terms_form_field' ) );
@@ -153,8 +147,24 @@ class Merchant_Agree_To_Terms_Checkbox extends Merchant_Add_Module {
 	 * @return void
 	 */
 	public function enqueue_css() {
-		// Specific module styles.
-		wp_enqueue_style( 'merchant-' . self::MODULE_ID, MERCHANT_URI . 'assets/css/modules/' . self::MODULE_ID . '/agree-to-terms-checkbox.min.css', array(), MERCHANT_VERSION );
+		if ( class_exists( 'WooCommerce' ) && is_checkout() ) {
+			//todo: check if we really need to enqueue this.
+			wp_enqueue_style( 'merchant-' . self::MODULE_ID, MERCHANT_URI . 'assets/css/modules/' . self::MODULE_ID . '/agree-to-terms-checkbox.min.css', array(),
+				MERCHANT_VERSION ); // Specific module styles.
+		}
+	}
+
+	/**
+	 * Force the function to always return a number that is greater than 0 to bypass the check if the terms page is set in woocommerce.
+	 *
+	 * @return int
+	 */
+	public function force_enabling_terms_page( $page_id ) {
+		if ( ! empty( $page_id ) ) {
+			return $page_id;
+		}
+
+		return 1;
 	}
 
 	/**
