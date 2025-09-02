@@ -3,7 +3,7 @@
  * Plugin Name: Merchant
  * Plugin URI:  https://athemes.com/merchant
  * Description: All-in-one WooCommerce plugin for pre-orders, product labels, buy now, quick view, discount rules and more.
- * Version:     2.1.7	
+ * Version:     2.1.7   
  * Author:      aThemes
  * Author URI:  https://athemes.com
  * License:     GPLv3 or later License
