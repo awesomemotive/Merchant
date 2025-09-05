@@ -8,16 +8,14 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      - name: GitHub Environment Variables Action
+        uses: FranzDiebold/github-env-vars-action@v2.8.0
+
       - name: Set Project Name
         run: |
           repo_full_name="${{ github.repository }}"
           repo_short_name="${repo_full_name##*/}"
           echo "PROJECT_NAME=${repo_short_name,,}" >> $GITHUB_ENV
-
-      - name: Sanitize Branch Name for Directory Path
-        run: |
-          branch_name="${{ github.ref_name }}"
-          echo "BRANCH_NAME_CLEAN=${branch_name//\//-}" >> $GITHUB_ENV
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -83,8 +81,8 @@ jobs:
 
       - name: Create builds directory structure
         run: |
-          mkdir -p builds/${{ env.PROJECT_NAME }}/${{ env.BRANCH_NAME_CLEAN }}
-          cp ${{ env.PROJECT_NAME }}.zip builds/${{ env.PROJECT_NAME }}/${{ env.BRANCH_NAME_CLEAN }}/
+          mkdir -p builds/${{ env.PROJECT_NAME }}/${{ env.CI_REF_NAME_SLUG }}
+          cp ${{ env.PROJECT_NAME }}.zip builds/${{ env.PROJECT_NAME }}/${{ env.CI_REF_NAME_SLUG }}/
 
       - name: Upload to hub.wpforms.com
         run: |
