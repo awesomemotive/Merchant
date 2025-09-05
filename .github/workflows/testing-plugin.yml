@@ -42,9 +42,13 @@ jobs:
 
       - name: Clean unneeded files
         run: |
-          [ -f .gitattributes ] && rm .gitattributes
           [ -d .github ] && rm -r .github
           [ -d .git ] && rm -r .git
+          [ -d assets/sass ] && rm -r assets/sass
+          [ -d assets/js/src ] && rm -r assets/js/src
+          [ -d node_modules ] && rm -r node_modules
+          [ -d tests ] && rm -r tests
+          [ -f .gitattributes ] && rm .gitattributes
           [ -f .gitignore ] && rm .gitignore
           [ -f phpcs.xml ] && rm phpcs.xml
           [ -f wpgulp.config.js ] && rm wpgulp.config.js
@@ -53,9 +57,7 @@ jobs:
           [ -f composer.lock ] && rm composer.lock
           [ -f package.json ] && rm package.json
           [ -f readme.md ] && rm readme.md
-          [ -d assets/sass ] && rm -r assets/sass
-          [ -d assets/js/src ] && rm -r assets/js/src
-          [ -d node_modules ] && rm -r node_modules
+          [ -f package-lock.json ] && rm package-lock.json
 
       - name: Create directory for the build
         run: mkdir ${{ env.PROJECT_NAME }}
@@ -91,7 +93,7 @@ jobs:
                 --whole-file \
                 --remove-source-files \
                 builds/ \
-                staging@34.68.130.55:/home/staging/shared/hub.wpforms.com/builds/athemes/${{ env.PROJECT_NAME }}
+                staging@34.68.130.55:/home/staging/shared/hub.wpforms.com/builds/${{ env.PROJECT_NAME }}
 
       - name: Upload file list as artifact
         uses: actions/upload-artifact@v4
