@@ -1,0 +1,54 @@
+name: Auto-builds Daily Cleanup
+
+'on':
+  workflow_dispatch:
+  schedule:
+    - cron: '1 0 * * *'
+
+jobs:
+  builds:
+    name: Delete builds for non existing branches
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: GitHub Environment Variables Action
+        uses: FranzDiebold/github-env-vars-action@v2.8.0
+
+      - name: Set Project Name
+        run: |
+          repo_full_name="${{ github.repository }}"
+          repo_short_name="${repo_full_name##*/}"
+          echo "PROJECT_NAME=${repo_short_name,,}" >> $GITHUB_ENV
+
+      - name: Setup SSH key for hub.wpforms.com upload
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.WPFORMS_TEST_DOCKER_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          chmod 700 ~/.ssh
+
+      - name: Prepare list of branches
+        run: |
+          git remote update --prune
+          git branch -r > branches.txt
+          sed -i 's/  origin\///g' branches.txt
+          sed -i 's/\//-/g' branches.txt
+          sed -i 's/\./-/g' branches.txt
+
+      - name: Get list of auto-builds
+        run: ssh -p18765 staging@34.68.130.55 "cd /home/staging/shared/hub.wpforms.com/builds/athemes/${{ env.PROJECT_NAME }} && ls" > auto-builds.txt
+
+      - name: Delete auto-builds if they're not in the list of branches
+        run: |
+          while read -r dir; do
+            echo "Checking auto-build: $dir"
+            if [ "$dir" = "index.php" ]
+            then
+              continue
+            fi
+            if ! grep -q "$dir" branches.txt
+            then
+              echo "Deleting auto-build: $dir"
+              ssh -n -p18765 staging@34.68.130.55 "cd /home/staging/shared/hub.wpforms.com/builds/athemes/${{ env.PROJECT_NAME }} && rm -rf $dir"
+            fi
+          done < auto-builds.txt
