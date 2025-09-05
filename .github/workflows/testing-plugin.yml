@@ -3,14 +3,16 @@ name: Auto-testing-builds & Deployments
 on:
   push:
 
-env:
-  current_project_name: merchant
-
 jobs:
   build-plugin-zip-asset:
     runs-on: ubuntu-22.04
 
     steps:
+      - name: Set Project Name
+        run: |
+          repo_name="${{ github.repository##*/ }}"
+          echo "PROJECT_NAME=${repo_name,,}" >> $GITHUB_ENV
+
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -55,13 +57,13 @@ jobs:
           [ -d node_modules ] && rm -r node_modules
 
       - name: Create directory for the build
-        run: mkdir ${{ env.current_project_name }}
+        run: mkdir ${{ env.PROJECT_NAME }}
 
       - name: Move files to the build directory
-        run: rsync -av --progress --exclude=${{ env.current_project_name }} . ${{ env.current_project_name }}/
+        run: rsync -av --progress --exclude=${{ env.PROJECT_NAME }} . ${{ env.PROJECT_NAME }}/
 
       - name: Create Artifact
-        run: zip -qq -r "${{ env.current_project_name }}.zip" ${{ env.current_project_name }}/
+        run: zip -qq -r "${{ env.PROJECT_NAME }}.zip" ${{ env.PROJECT_NAME }}/
 
       # New steps for hub.wpforms.com upload
       - name: Setup SSH key for hub.wpforms.com upload
@@ -74,7 +76,7 @@ jobs:
       - name: Create builds directory structure
         run: |
           mkdir -p builds/${{ github.ref_name }}
-          cp ${{ env.current_project_name }}.zip builds/${{ github.ref_name }}/
+          cp ${{ env.PROJECT_NAME }}.zip builds/${{ github.ref_name }}/
 
       - name: Upload to hub.wpforms.com
         run: |
@@ -88,10 +90,10 @@ jobs:
                 --whole-file \
                 --remove-source-files \
                 builds/ \
-                staging@34.68.130.55:/home/staging/shared/hub.wpforms.com/builds/${{ env.current_project_name }}
+                staging@34.68.130.55:/home/staging/shared/hub.wpforms.com/builds/${{ env.PROJECT_NAME }}
 
       - name: Upload file list as artifact
         uses: actions/upload-artifact@v4
         with:
           name: build-file
-          path: ${{ env.current_project_name }}.zip
+          path: ${{ env.PROJECT_NAME }}.zip
