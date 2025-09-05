@@ -1,48 +1,63 @@
+# Workflow name
 name: Auto-testing-builds & Deployments
 
+# Trigger the workflow on every push to the repository
 on:
   push:
 
+# Define the jobs to be executed
 jobs:
   build:
+    # Specify the runner environment
     runs-on: ubuntu-22.04
 
+    # Define the steps for the build job
     steps:
+      # Use a third-party action to expose GitHub environment variables
       - name: GitHub Environment Variables Action
         uses: FranzDiebold/github-env-vars-action@v2.8.0
 
+      # Set the project name based on the repository name
       - name: Set Project Name
         run: |
           repo_full_name="${{ github.repository }}"
           repo_short_name="${repo_full_name##*/}"
           echo "PROJECT_NAME=${repo_short_name,,}" >> $GITHUB_ENV
 
+      # Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Setup PHP 8.0 environment
       - name: Setup PHP 8.0
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.0
           tools: composer
 
+      # Install Node.js version 21
       - name: Install Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '21'
 
+      # Install PHP dependencies for production
       - name: Install dependencies
         run: composer install --no-dev --ignore-platform-reqs --prefer-dist --no-scripts --optimize-autoloader
 
+      # Install Node.js dependencies
       - name: Install nodejs dependencies
         run: npm install
 
+      # Generate the production build
       - name: Generate production build
         run: npm run production
 
+      # Generate translation files
       - name: Generate translation files
         run: npm run translate
 
+      # Remove unnecessary files and directories to clean up the build
       - name: Clean unneeded files
         run: |
           [ -d .github ] && rm -r .github
@@ -62,16 +77,20 @@ jobs:
           [ -f readme.md ] && rm readme.md
           [ -f package-lock.json ] && rm package-lock.json
 
+      # Create a directory to store the build files
       - name: Create directory for the build
         run: mkdir ${{ env.PROJECT_NAME }}
 
+      # Move the cleaned files to the build directory
       - name: Move files to the build directory
         run: rsync -av --progress --exclude=${{ env.PROJECT_NAME }} . ${{ env.PROJECT_NAME }}/
 
+      # Create a zip archive of the build directory
       - name: Create Artifact
         run: zip -qq -r "${{ env.PROJECT_NAME }}.zip" ${{ env.PROJECT_NAME }}/
 
       # New steps for hub.wpforms.com upload
+      # Setup SSH key for secure connection to the deployment server
       - name: Setup SSH key for hub.wpforms.com upload
         run: |
           mkdir -p ~/.ssh
@@ -79,11 +98,13 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           chmod 700 ~/.ssh
 
+      # Create the necessary directory structure on the deployment server
       - name: Create builds directory structure
         run: |
           mkdir -p builds/${{ env.PROJECT_NAME }}/${{ env.CI_REF_NAME_SLUG }}
           cp ${{ env.PROJECT_NAME }}.zip builds/${{ env.PROJECT_NAME }}/${{ env.CI_REF_NAME_SLUG }}/
 
+      # Upload the build to the deployment server
       - name: Upload to hub.wpforms.com
         run: |
           rsync --rsh="ssh -o StrictHostKeyChecking=no -p18765" \
@@ -98,6 +119,7 @@ jobs:
                 builds/ \
                 staging@34.68.130.55:/home/staging/shared/hub.wpforms.com/builds/athemes/
 
+      # Upload the generated zip file as a workflow artifact
       - name: Upload file list as artifact
         uses: actions/upload-artifact@v4
         with:
