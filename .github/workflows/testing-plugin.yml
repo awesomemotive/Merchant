@@ -66,10 +66,8 @@ jobs:
       # New steps for hub.wpforms.com upload
       - name: Setup SSH key for hub.wpforms.com upload
         run: |
-          echo "${{ secrets.WPFORMS_TEST_DOCKER_SSH_PRIVATE_KEY }}" > /root/.ssh/id_ed25519
-          chmod 600 /root/.ssh/id_ed25519
-          chmod 700 /root/.ssh
-          ssh-keyscan -p 18765 34.68.130.55 >> /root/.ssh/known_hosts
+          echo "${{ SECRETS.WPFORMS_TEST_DOCKER_SSH_PRIVATE_KEY }}" > /root/.ssh/id_ed25519
+          chmod 600 /root/.ssh/id_ed25519 && chmod 700 /root/.ssh
 
       - name: Create builds directory structure
         run: |
