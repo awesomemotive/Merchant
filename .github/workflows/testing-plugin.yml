@@ -78,8 +78,8 @@ jobs:
 
       - name: Create builds directory structure
         run: |
-          mkdir -p builds/athemes/${{ github.ref_name }}
-          cp ${{ env.PROJECT_NAME }}.zip builds/athemes/${{ github.ref_name }}/
+          mkdir -p builds/${{ github.ref_name }}
+          cp ${{ env.PROJECT_NAME }}.zip builds/${{ github.ref_name }}/
 
       - name: Upload to hub.wpforms.com
         run: |
