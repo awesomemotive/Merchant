@@ -14,6 +14,11 @@ jobs:
           repo_short_name="${repo_full_name##*/}"
           echo "PROJECT_NAME=${repo_short_name,,}" >> $GITHUB_ENV
 
+      - name: Sanitize Branch Name for Directory Path
+        run: |
+          branch_name="${{ github.ref_name }}"
+          echo "BRANCH_NAME_CLEAN=${branch_name//\//-}" >> $GITHUB_ENV
+
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -78,8 +83,8 @@ jobs:
 
       - name: Create builds directory structure
         run: |
-          mkdir -p builds/${{ env.PROJECT_NAME }}/${{ github.ref_name }}
-          cp ${{ env.PROJECT_NAME }}.zip builds/${{ env.PROJECT_NAME }}/${{ github.ref_name }}/
+          mkdir -p builds/${{ env.PROJECT_NAME }}/${{ env.BRANCH_NAME_CLEAN }}
+          cp ${{ env.PROJECT_NAME }}.zip builds/${{ env.PROJECT_NAME }}/${{ env.BRANCH_NAME_CLEAN }}/
 
       - name: Upload to hub.wpforms.com
         run: |
