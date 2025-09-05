@@ -93,7 +93,7 @@ jobs:
                 --whole-file \
                 --remove-source-files \
                 builds/ \
-                staging@34.68.130.55:/home/staging/shared/hub.wpforms.com/builds/athemes
+                staging@34.68.130.55:/home/staging/shared/hub.wpforms.com/builds/athemes/${{ env.PROJECT_NAME }}
 
       - name: Upload file list as artifact
         uses: actions/upload-artifact@v4
