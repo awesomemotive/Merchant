@@ -1,0 +1,97 @@
+name: Auto-testing-builds & Deployments
+
+on:
+  push:
+
+env:
+  current_project_name: merchant
+
+jobs:
+  build-plugin-zip-asset:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP 8.0
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          tools: composer
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '21'
+
+      - name: Install dependencies
+        run: composer install --no-dev --ignore-platform-reqs --prefer-dist --no-scripts --optimize-autoloader
+
+      - name: Install nodejs dependencies
+        run: npm install
+
+      - name: Generate production build
+        run: npm run production
+
+      - name: Generate translation files
+        run: npm run translate
+
+      - name: Clean unneeded files
+        run: |
+          [ -f .gitattributes ] && rm .gitattributes
+          [ -d .github ] && rm -r .github
+          [ -d .git ] && rm -r .git
+          [ -f .gitignore ] && rm .gitignore
+          [ -f phpcs.xml ] && rm phpcs.xml
+          [ -f wpgulp.config.js ] && rm wpgulp.config.js
+          [ -f gulpfile.babel.js ] && rm gulpfile.babel.js
+          [ -f composer.json ] && rm composer.json
+          [ -f composer.lock ] && rm composer.lock
+          [ -f package.json ] && rm package.json
+          [ -f readme.md ] && rm readme.md
+          [ -d assets/sass ] && rm -r assets/sass
+          [ -d assets/js/src ] && rm -r assets/js/src
+          [ -d node_modules ] && rm -r node_modules
+
+      - name: Create directory for the build
+        run: mkdir ${{ env.current_project_name }}
+
+      - name: Move files to the build directory
+        run: rsync -av --progress --exclude=${{ env.current_project_name }} . ${{ env.current_project_name }}/
+
+      - name: Create Artifact
+        run: zip -qq -r "${{ env.current_project_name }}.zip" ${{ env.current_project_name }}/
+
+      # New steps for hub.wpforms.com upload
+      - name: Setup SSH key for hub.wpforms.com upload
+        run: |
+          echo "${{ secrets.WPFORMS_TEST_DOCKER_SSH_PRIVATE_KEY }}" > /root/.ssh/id_ed25519
+          chmod 600 /root/.ssh/id_ed25519
+          chmod 700 /root/.ssh
+          ssh-keyscan -p 18765 34.68.130.55 >> /root/.ssh/known_hosts
+
+      - name: Create builds directory structure
+        run: |
+          mkdir -p builds/${{ github.ref_name }}
+          cp ${{ env.current_project_name }}.zip builds/${{ github.ref_name }}/
+
+      - name: Upload to hub.wpforms.com
+        run: |
+          rsync --rsh="ssh -o StrictHostKeyChecking=no -p18765" \
+                --ignore-times \
+                --archive \
+                --verbose \
+                --compress \
+                --human-readable \
+                --progress \
+                --whole-file \
+                --remove-source-files \
+                builds/ \
+                staging@34.68.130.55:/home/staging/shared/hub.wpforms.com/builds/${{ env.current_project_name }}
+
+      - name: Upload file list as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-file
+          path: ${{ env.current_project_name }}.zip
