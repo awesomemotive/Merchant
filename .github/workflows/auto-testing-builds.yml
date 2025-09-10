@@ -68,12 +68,6 @@ jobs:
       # This includes development-related files, version control directories, and source assets.
       - name: Clean unneeded files
         run: |
-          [ -d .github ] && rm -r .github
-          [ -d .git ] && rm -r .git
-          [ -d assets/sass ] && rm -r assets/sass
-          [ -d assets/js/src ] && rm -r assets/js/src
-          [ -d node_modules ] && rm -r node_modules
-          [ -d tests ] && rm -r tests
           [ -f .gitattributes ] && rm .gitattributes
           [ -f .gitignore ] && rm .gitignore
           [ -f phpcs.xml ] && rm phpcs.xml
@@ -82,8 +76,16 @@ jobs:
           [ -f composer.json ] && rm composer.json
           [ -f composer.lock ] && rm composer.lock
           [ -f package.json ] && rm package.json
-          [ -f readme.md ] && rm readme.md
           [ -f package-lock.json ] && rm package-lock.json
+          [ -f playwright.config.js ] && rm playwright.config.js
+          [ -f readme.md ] && rm readme.md
+          [ -d .github ] && rm -r .github
+          [ -d .git ] && rm -r .git
+          [ -d assets/sass ] && rm -r assets/sass
+          [ -d assets/js/src ] && rm -r assets/js/src
+          [ -d node_modules ] && rm -r node_modules
+          [ -d .cursor ] && rm -r .cursor
+          [ -d tests ] && rm -r tests
 
       # Creates a new directory named after the project to hold the build files.
       - name: Create directory for the build
