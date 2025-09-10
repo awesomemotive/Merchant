@@ -10,6 +10,7 @@ jobs:
   build:
     # Specifies the runner environment for the job. In this case, it\'s Ubuntu 22.04.
     runs-on: ubuntu-22.04
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
 
     # Defines the sequence of steps that make up the \'build\' job.
     steps:
@@ -27,7 +28,7 @@ jobs:
 
       # Checks out the repository\'s code so the workflow can access it.
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
 
       # Sets up PHP version 8.0 and installs Composer.
       - name: Setup PHP 8.0
