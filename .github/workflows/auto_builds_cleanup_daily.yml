@@ -11,7 +11,7 @@ name: Auto-builds Daily Cleanup
     - cron: '1 0 * * *' # Runs the workflow every day at 00:01.
 
 jobs:
-  builds:
+  cleaning:
     name: Delete builds for non existing branches
     runs-on: ubuntu-22.04
 
