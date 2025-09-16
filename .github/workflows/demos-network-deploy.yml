@@ -1,5 +1,4 @@
-# GitHub Actions Workflow to deploy to the demos network server
-# This workflow will also deploy the plugin to the Instawp template
+# GitHub Actions Workflow to deploy on production demos site
 
 name: Deploy to demos network
 
@@ -7,78 +6,36 @@ on:
   push:
     branches:
       - main
-      
+
 jobs:
+  create-project-build:
+    uses: awesomemotive/Merchant/.github/workflows/build.yml@main
+
   deploy:
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted
+    needs: create-project-build
+
     steps:
-      - name: 🚚 Get latest code
-        uses: actions/checkout@v3
-
-      - name: Setup PHP 8.0
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.0
-          tools: composer
-
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '21'
-
-      - name: Install dependencies
-        run: composer install --no-dev --ignore-platform-reqs --prefer-dist --no-scripts --optimize-autoloader
-
-      - name: Install nodejs dependencies
-        run: npm install
-
-      - name: Generate production build
-        run: npm run production
-
-      - name: Generate translation files
-        run: npm run translate
-
-      - name: Clean unneeded files
+      - name: Set Project Name
         run: |
-          [ -f .gitattributes ] && rm .gitattributes
-          [ -d .github ] && rm -r .github
-          [ -d .git ] && rm -r .git
-          [ -f .gitignore ] && rm .gitignore
-          [ -f phpcs.xml ] && rm phpcs.xml
-          [ -f wpgulp.config.js ] && rm wpgulp.config.js
-          [ -f gulpfile.babel.js ] && rm gulpfile.babel.js
-          [ -f composer.json ] && rm composer.json
-          [ -f composer.lock ] && rm composer.lock
-          [ -f package.json ] && rm package.json
-          [ -f readme.md ] && rm readme.md
-          [ -d assets/sass ] && rm -r assets/sass
-          [ -d assets/js/src ] && rm -r assets/js/src
-          [ -d node_modules ] && rm -r node_modules
+          repo_full_name="${{ github.repository }}"
+          repo_short_name="${repo_full_name##*/}"
+          echo "PROJECT_NAME=${repo_short_name,,}" >> $GITHUB_ENV
 
-      - name: Create directory for artifacts
-        run: mkdir merchant
+      - name: Download artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: ${{ env.PROJECT_NAME }}
+          path: ${{ env.PROJECT_NAME }}
 
-      - name: Move files to merchant directory
-        run: rsync -av --progress --exclude=merchant . merchant/
-  
-      - name: 📂 Deploy files to the Demos Network
+      - name: Sync files with SSH
         uses: easingthemes/ssh-deploy@main
-
-        env:
+        with:
           SSH_PRIVATE_KEY: ${{secrets.SERVER_SSH_KEY}}
           ARGS: "-rlgoDzvc -i --delete"
-          SOURCE: "merchant/"
+          SOURCE: "${{ env.PROJECT_NAME }}/"
           REMOTE_HOST: ${{secrets.SERVER_REMOTE_HOST}}
           REMOTE_USER: ${{secrets.SERVER_REMOTE_USER}}
           REMOTE_PORT: "22"
-          TARGET: "www/wp-content/plugins/merchant/"
-
-      - name: 📂 Deploy files to the Instawp template
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.INSTAWP_SERVER_REMOTE_HOST }}
-          username: ${{ secrets.INSTAWP_SERVER_REMOTE_USER }}
-          password: ${{ secrets.INSTAWP_SERVER_REMOTE_PASSWORD }}
-          port: "22"
-          source: "./"
-          target: /home/${{secrets.INSTAWP_SERVER_REMOTE_USER}}/web/merchant-pro.instawp.xyz/public_html/wp-content/plugins/merchant/
+          TARGET: "www/wp-content/plugins/${{ env.PROJECT_NAME }}/"
+        

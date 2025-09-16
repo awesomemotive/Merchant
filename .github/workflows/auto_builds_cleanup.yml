@@ -1,0 +1,38 @@
+# Workflow name
+name: Auto-builds PR Cleanup
+
+# This workflow is triggered when a pull request is closed (either merged or closed without merging).
+on:
+  pull_request:
+    types: [ closed ]
+    branches-ignore: [ main ]
+
+env:
+  builds-directory: ~/builds/athemes
+
+jobs:
+  cleaning:
+    # The type of runner that the job will run on.
+    runs-on: self-hosted
+
+    steps:
+      # This action exposes GitHub environment variables to be used in subsequent steps.
+      - name: GitHub Environment Variables Action
+        uses: FranzDiebold/github-env-vars-action@v2.8.0
+
+      # This step sets a project name environment variable based on the repository name.
+      # It takes the full repository name (e.g., "owner/repo"), extracts the repository name part,
+      # converts it to lowercase, and saves it as PROJECT_NAME in the GitHub environment.
+      - name: Set Project Name
+        run: |
+          repo_full_name="${{ github.repository }}"
+          repo_short_name="${repo_full_name##*/}"
+          echo "PROJECT_NAME=${repo_short_name,,}" >> $GITHUB_ENV
+
+      - name: Delete merged branch from local builds directory
+        run: rm -rf ${{ env.builds-directory }}/${{ env.PROJECT_NAME }}/${{ env.CI_REF_NAME_SLUG }}
+
+      # This step connects to the staging server via SSH and deletes the build directory
+      # associated with the closed pull request's branch.
+      - name: Delete merged branch from hub.wpforms.com/builds
+        run: ssh -p18765 staging@${{ secrets.WPFORMS_STAGING_HOST }} "cd /home/staging/shared/hub.wpforms.com/builds/athemes/${{ env.PROJECT_NAME }} && rm -rf ${{ env.CI_ACTION_REF_NAME_SLUG }}"
