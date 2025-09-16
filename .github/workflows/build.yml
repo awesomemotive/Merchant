@@ -59,16 +59,14 @@ jobs:
           [ -f composer.lock ] && rm composer.lock
           [ -f package.json ] && rm package.json
           [ -f package-lock.json ] && rm package-lock.json
-          [ -f readme.md ] && rm readme.md
           [ -f playwright.config.js ] && rm playwright.config.js
-          [ -f webpack.config.js ] && rm webpack.config.js
-          [ -d .cursor ] && rm -r .cursor
+          [ -f readme.md ] && rm readme.md
           [ -d .github ] && rm -r .github
           [ -d .git ] && rm -r .git
           [ -d assets/sass ] && rm -r assets/sass
           [ -d assets/js/src ] && rm -r assets/js/src
           [ -d node_modules ] && rm -r node_modules
-          [ -d playwright-report ] && rm -r playwright-report
+          [ -d .cursor ] && rm -r .cursor
           [ -d tests ] && rm -r tests
 
       - name: Create directory for build zip
